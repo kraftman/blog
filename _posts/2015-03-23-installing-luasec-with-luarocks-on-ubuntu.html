@@ -1,0 +1,25 @@
+---
+layout: post
+status: publish
+published: true
+title: Installing luasec with luarocks on ubuntu
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 217
+wordpress_url: http://itschr.is/?p=217
+date: '2015-03-23 11:49:26 +0000'
+date_gmt: '2015-03-23 11:49:26 +0000'
+categories:
+- Coding
+- Linux
+tags: []
+comments: []
+---
+<p>Came across this error today while trying to install luasec:</p>
+<blockquote><p>Error: Could not find expected file libssl.a, or libssl.so, or libssl.so.* for OPENSSL -- you may have to install OPENSSL in your system and/or pass OPENSSL_DIR or OPENSSL_LIBDIR to the luarocks command. Example: luarocks install luasec OPENSSL_DIR=/usr/local</p></blockquote>
+<p>The solution is to find the libssl files</p>
+<blockquote><p>find / -name 'libssl.*'</p></blockquote>
+<p>and then add the the path using&nbsp;OPENSSL_<strong>LIB</strong>DIR on the end of the command, e.g:</p>
+<blockquote><p>sudo luarocks install luasec OPENSSL_LIBDIR=/usr/lib/x86_64-linux-gnu/</p></blockquote>

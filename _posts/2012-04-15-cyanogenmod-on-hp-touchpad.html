@@ -1,0 +1,31 @@
+---
+layout: post
+status: publish
+published: true
+title: Cyanogenmod on HP Touchpad
+author:
+  display_name: Chris Tanner
+  login: chris
+  email: 
+  url: https://itschr.is
+author_login: chris
+author_email: 
+author_url: https://itschr.is
+wordpress_id: 21
+wordpress_url: http://itschr.is/?p=21
+date: '2012-04-15 11:56:00 +0000'
+date_gmt: '2012-04-15 11:56:00 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<div dir="ltr" trbidi="on"><span>I had a bit of time today, so I decided to update my HP Touchpad to the ICS version of Cyanogenmod. As usual, the nice easy guide didn't work for me, and I ended up faffing around for ages trying to work out why.</span><br><span><br></span><br><span>The point I got stuck at was step 10 of the&nbsp;<a href="http://wiki.cyanogenmod.com/wiki/HP_Touchpad:_Full_Update_Guide">guide</a>:</span><br><br><span><span>type: novacom boot mem:// < ACMEInstaller2 into the command line.</span></span><br><span><br></span><br>
+<div><span><span>The problem here was that instead of it starting the update process as desired, it instead simply said "no device found." Turns out that the novacom drivers didn't install properly, or windows didn't like them. I found&nbsp;<a href="http://code.google.com/p/universal-novacom-installer/">this handy tool</a>&nbsp;which auto detects and installs the drivers, however that didn't work either.&nbsp;</span></span></div>
+<div><span><br></span></div>
+<div><span>Manually installing the driver in Device Manager also failed miserably, so I was pulling my hair out slightly.</span></div>
+<div><span><br></span></div>
+<div><span>In the end I found&nbsp;<a href="http://wiki.rootzwiki.com/HP_Touchpad">this page</a>&nbsp;with some slightly different drivers, and success! The drivers finally worked and ACMEInstaller2 ran successfully.</span></div>
+<div><span><br></span></div>
+<div><span>I hope this helps anyone else out there who might come across the same issue.</span></div>
+<p><br></div>

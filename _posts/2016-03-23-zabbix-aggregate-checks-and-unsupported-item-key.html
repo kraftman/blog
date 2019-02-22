@@ -1,0 +1,24 @@
+---
+layout: post
+status: publish
+published: true
+title: Zabbix Aggregate Checks and "Unsupported Item Key"
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 269
+wordpress_url: http://itschr.is/?p=269
+date: '2016-03-23 10:42:33 +0000'
+date_gmt: '2016-03-23 10:42:33 +0000'
+categories:
+- Uncategorized
+- Coding
+- Linux
+tags: []
+comments: []
+---
+<h4>Problem:</h4>
+<p>Trying to create an aggregate check in Zabbix to measure total bandwidth in a group of servers using 'grpsum', get status 'Not supported' and error message 'Unsupported item key.'</p>
+<h4>Solution:</h4>
+<p>It's not anywhere obvious in <a title="Zabbix aggregate checks" href="https://www.zabbix.com/documentation/3.2/manual/config/items/itemtypes/aggregate">the docs</a>&nbsp; or after googling the error, but the item type needs to be changed from 'Zabbix agent' to 'Zabbix aggregate'</p>

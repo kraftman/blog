@@ -1,0 +1,31 @@
+---
+layout: post
+status: publish
+published: true
+title: Converting InnoDB to MyISAM
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 255
+wordpress_url: http://itschr.is/?p=255
+date: '2015-12-27 21:25:39 +0000'
+date_gmt: '2015-12-27 21:25:39 +0000'
+categories:
+- Coding
+- Linux
+tags: []
+comments: []
+---
+<p>Problem:</p>
+<p>Trying to convert from InnoDB to MyISAM for smaller RAM footprint MySQL on a tiny VPS</p>
+<p>Solution:</p>
+<p>adding skip-innodb on its own didn't work, had to add:</p>
+<p>default-storage-engine = MYISAM</p>
+<p>skip-innodb</p>
+<p>And then run:</p>
+<blockquote>
+<pre><code>CONVERT_SCRIPT=Convert_InnoDB_to_MyISAM.sql
+mysql -u... -p... -AN -e"SELECT CONCAT('ALTER TABLE ',table_schema,'.',table_name,' ENGINE=MyISAM;') FROM information_schema.tables WHERE engine ='InnoDB';" > ${CONVERT_SCRIPT}
+mysql -u... -p... -A < ${CONVERT_SCRIPT}</code></pre>
+</blockquote>

@@ -1,0 +1,31 @@
+---
+layout: post
+status: publish
+published: true
+title: Customising Google Maps Markers pt.2, Graph Overlay
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 64
+wordpress_url: http://itschr.is/?p=64
+date: '2013-10-26 22:55:14 +0000'
+date_gmt: '2013-10-26 22:55:14 +0000'
+categories:
+- Coding
+- Javascript
+tags:
+- csharp
+- graph
+- piechart
+- maps
+- overlay
+comments: []
+---
+<p>Quick update from the previous post: I decided I wanted to add more detail to my map by showing small pie charts instead of markers.</p>
+<p>After trying and failing to use Google's old <a href="https://developers.google.com/chart/image/">Image Charts</a>&nbsp;for the marker images, I found a very neat solution on <a href="http://stackoverflow.com/questions/17502438/pie-chart-on-google-map">StackOverflow</a>&nbsp;that solves the problem nicely by rendering Google's new interactive charts onto a custom overlay above the map:</p>
+<p><a href="http://itschr.is/wp-content/uploads/2013/10/map3.png"><img class="alignnone size-full wp-image-66" alt="map3" src="http://itschr.is/wp-content/uploads/2013/10/map3.png" width="628" height="318" /></a></p>
+<p>I then added a piehole to make overlapping charts easier to see:</p>
+<p><a href="http://itschr.is/wp-content/uploads/2013/10/map2.png"><img class="alignnone size-full wp-image-65" alt="map2" src="http://itschr.is/wp-content/uploads/2013/10/map2.png" width="618" height="407" /></a></p>
+<p>Passing in the extra data was also a slight pain because I needed to use a Dictionary<string, int> for the values of the pie chart, which csharp can't serialise to JSON for some reason. Luckily someone has already written a nice <a href="http://weblogs.asp.net/pwelter34/archive/2006/05/03/444961.aspx">serialisable version</a>&nbsp;which did the job.</p>
+<p>Next on the list is showing more details when clicking on the graph.</p>

@@ -1,0 +1,29 @@
+---
+layout: post
+status: publish
+published: true
+title: Docker 404 during apt get update
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 282
+wordpress_url: https://itschr.is/?p=282
+date: '2016-09-27 21:18:44 +0000'
+date_gmt: '2016-09-27 21:18:44 +0000'
+categories:
+- Coding
+- Linux
+tags: []
+comments: []
+---
+<h4>Problem:</h4>
+<p>During build of ubuntu images, apt-get can't resolve any archives (404's or 'Cannot initiate the connection').</p>
+<h4>Solution:</h4>
+<p>The issue is caused by the docker bridge hanging, so try <a href="http://serverfault.com/questions/642981/docker-containers-cant-resolve-dns-on-ubuntu-14-04-desktop-host">the following</a>:<br />
+<code> sudo apt-get install bridge-utils<br />
+ pkill docker<br />
+ iptables -t nat -F<br />
+ ifconfig docker0 down<br />
+ brctl delbr docker0<br />
+ sudo service docker restart</code></p>

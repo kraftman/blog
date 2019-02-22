@@ -1,0 +1,68 @@
+---
+layout: post
+status: publish
+published: true
+title: Redis notes
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 335
+wordpress_url: https://itschr.is/?p=335
+date: '2017-04-03 10:44:20 +0000'
+date_gmt: '2017-04-03 10:44:20 +0000'
+categories:
+- Coding
+- Linux
+- redis
+tags: []
+comments: []
+---
+<p>I decided the&nbsp;<a href="https://github.com/antirez/redis-doc/pull/813/files">tidy up the redis docs</a>&nbsp;and I wrote some notes for myself on the way:</p>
+<h4>Redis as pure cache:</h4>
+<p>Setting maxmemory and maxmemory-policy to 'allkeys-lru' will make redis auto expire all keys, starting with the oldest first, without any need for manually setting EXPIRE. Perfect when used just for caching.</p>
+<h4>Lexicographical sorted sets:</h4>
+<p>Elements stored under the same key in a sorted set can be retrieved lexicographicaly, powerful for string searching. If you need to normalise a string while retaining the original, you can store them together. E.g. 'banana:Banana' to ignore case while searching but preserve the case of the result.</p>
+<h4>Distributed Locks</h4>
+<p>Getting distributed locks safely is more complicated than it first appears, with a few edge cases that may cause locks to not be released, etc.&nbsp;<a href="https://redis.io/topics/distlock">Redlock</a> has been written as a general solution, and has a large number of implementations in different languages.</p>
+<h4>Redis-cli</h4>
+<ul>
+<li>Only returns extra info for tty, raw for all others</li>
+<li>Can be set to repeat commands using -r <count> -i <delay></li>
+<li>&nbsp;'--stat' produces continuous stats</li>
+<li>&nbsp;Can scan for big keys with --big-keys (can be used in production)</li>
+<li>&nbsp;Supports pub/sub directly</li>
+<li>&nbsp;Can echo all redis commands using MONITOR</li>
+<li>&nbsp;Can show redis latency and intrinsic latency</li>
+<li>&nbsp;Can grab RDB from server</li>
+<li>&nbsp;Can simulate LRU load with 80/20 access rates</li>
+</ul>
+<h4>Replication</h4>
+<ul>
+<li>Slaves can chain (slave -> slave replication, doesn't replicate local slave writes)</li>
+<li>Master can use diskless replication, sends rdb directly to slave from mem.</li>
+<li>Master can be set to reject writes unless a certain number of slaves are available.</li>
+</ul>
+<h4>Sentinel</h4>
+<ul>
+<li>&nbsp;Clients can subscribe to sentinel pub/sub for events.</li>
+<li>&nbsp;Sentinels never forget seen sentinels</li>
+<li>&nbsp;Slaves can be given promotion priority to avoid or prefer them becoming masters.</li>
+</ul>
+<h4>Transactions</h4>
+<ul>
+<li>DISCARD cancels the current queue</li>
+<li>WATCH will cancel&nbsp;EXEC if the watched key has changed since the WATCH command was issued.</li>
+</ul>
+<h4>Other</h4>
+<ul>
+<li>SUNION can take a long time for large/many sets.</li>
+<li>The Lua debugger can be used to step through lua scripts line by line.</li>
+<li>Total memory used can exceed maxmemory briefly, could be by a large amount but only if setting a large key.</li>
+<li>If you are storing a lot of objects in a set, split the key apart and use the first part as a hash key instead -> more memory efficient. ('test1234' -> 'test1' '234' <value>)</li>
+<li>Publishing ignores database members</li>
+<li>Subscribing supports pattern matching</li>
+<li>Clients may receive&nbsp;duplicated messages if they have multiple subscriptions</li>
+<li>Keyspace notifications can report all commands affecting a key, all keys receiving lpush, and all keys expiring in db 0.</li>
+<li>Expired keys only fire when they are actually expired by redis, not the exact time they should expire.</li>
+</ul>

@@ -1,0 +1,34 @@
+---
+layout: post
+status: publish
+published: true
+title: Expanding a partition on an Ubuntu KVM VM
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 14
+wordpress_url: http://itschr.is/?p=14
+date: '2013-07-06 09:57:00 +0000'
+date_gmt: '2013-07-06 09:57:00 +0000'
+categories:
+- Linux
+tags: []
+comments: []
+---
+<div dir="ltr">For next time I need to do this, and forget how, the easiest way to expand a partition inside a KVM virtual machine is to:</div>
+<div dir="ltr"></div>
+<div dir="ltr">1. Boot onto an Ubuntu Live CD.<br />
+- Add a virtual CD drive if there isn't one already, I used an ubuntu desktop iso, but anything with GParted will do.<br />
+- Set the boot priority to try the CD drive first.<br />
+- Reboot the VM2. Resize the Partition<br />
+- Open up gparted<br />
+- Move any partitions that may be in the way of the one you want to expand<br />
+- Expand the desired partition<br />
+- Apply the changes</p>
+<p>3. Resize the Filesystem<br />
+- Remove the CD drive/change the boot order to boot from the hard drive again<br />
+- Reboot the VM back into the Native OS<br />
+- Run resize2fs with the drive you need to expand, eg resize2fs /dev/sda1</p>
+<p>Done!</p>
+</div>

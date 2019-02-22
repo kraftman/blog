@@ -1,0 +1,48 @@
+---
+layout: post
+status: publish
+published: true
+title: Customising Google Maps Markers
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 35
+wordpress_url: http://itschr.is/?p=35
+date: '2013-10-20 21:13:15 +0000'
+date_gmt: '2013-10-20 21:13:15 +0000'
+categories:
+- Coding
+- Javascript
+tags:
+- google maps
+- markers
+- api
+- jquery
+- ajax
+- csharp
+comments: []
+---
+<p>Quick delve into the world of Google maps this weekend when trying to map ADSL faults to their location.</p>
+<p>My aims were to group the faults by the exchange they connect to, change the image icon, and resize it based on the number of faults at that exchange.</p>
+<p><a href="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/docs/reference.html">MarkerClusterer</a>&nbsp;groups markers by proximity but doesn't seem to allow custom grouping, so I decide to DIY it.</p>
+<p>After testing the basics with PHP, I set up a simple WebService with C# that would provide the latitude and longitude of the Exchange, its name, and the number of faults. I then call the WebService using ajax:</p>
+<p><code>$.ajax({<br />
+ type: "POST",<br />
+ url: "WebService.asmx/GetMarkers",<br />
+ data: '',<br />
+ contentType: "application/json; charset=utf-8", dataType: "json",<br />
+ success: function (msg) {</code></p>
+<p>I then iterate through each object in the JSON array and use the count value for the number of faults to set the</p>
+<p><code>$.each(msg.d, function (index, item) {<br />
+size = 5 + Math.min( (item.Count / 2) * 5, 50);<br />
+var image = new google.maps.MarkerImage("disconnect2.png", null, null, null, new google.maps.Size(size, size));</code></p>
+<p>and then generate the marker with a custom image, the calculated size, and the exchange code:</p>
+<p><code>var marker = new google.maps.Marker({<br />
+ position: new google.maps.LatLng(parseFloat(item.Lat), parseFloat(item.Long)),<br />
+ map: map,<br />
+ icon: image,<br />
+ title: item.CircuitID<br />
+ });</code></p>
+<p>And then we get this!</p>
+<p><a href="http://itschr.is/wp-content/uploads/2013/10/map.png"><img class="alignnone size-full wp-image-48" alt="map" src="http://itschr.is/wp-content/uploads/2013/10/map.png" width="658" height="678" /></a></p>

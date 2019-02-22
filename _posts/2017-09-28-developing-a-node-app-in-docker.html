@@ -1,0 +1,29 @@
+---
+layout: post
+status: publish
+published: true
+title: Developing a node app in docker
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 331
+wordpress_url: https://itschr.is/?p=331
+date: '2017-09-28 21:57:14 +0000'
+date_gmt: '2017-09-28 21:57:14 +0000'
+categories:
+- Coding
+- node
+- docker
+tags: []
+comments: []
+---
+<h3>Problem</h3>
+<p>We want to rapidly develop our node app inside a docker container, being able to install modules, make code changes, and see instant results. The problem is that while the <a href="https://nodejs.org/en/docs/guides/nodejs-docker-webapp">official node image</a> supports a handy onbuild feature which will grab the package.json and install everything we need, this also means having to rebuild the image every time a dependency changes.</p>
+<h3>Solution</h3>
+<p><del>Use <a href="https://github.com/grahamgilchrist/docker-node-onbuild">this image</a>, which places the node_modules folder one level higher, meaning it isn't overwritten by the docker mount, and you can still mount and install your own node modules on the fly.</del></p>
+<p>Edit:</p>
+<p>An easier but less obvious way to solve the problem is to specify your /usr/src/app/node_modules folder as a volume with no mapping to the host. This preserves the container copy and allows you to keep your local copy.</p>
+<p>Example:</p>
+<p>volumes: - /usr/src/app/node_modules</p>
+<p>When you're deploying the image and need to copy the entire app in, you can use the .dockerignore file to prevent your host node_modules from being loaded into the build context, improving build time</p>

@@ -1,0 +1,58 @@
+---
+layout: post
+status: publish
+published: true
+title: Minecraft Monitoring with Zabbix Part 2
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 196
+wordpress_url: http://itschr.is/?p=196
+date: '2014-03-25 22:43:05 +0000'
+date_gmt: '2014-03-25 22:43:05 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<p>This is just a quick update on the previous post about monitoring zabbix, and assumes you already have zabbix set up and monitoring the basic properties of your server. (if you don't, <a title="MC DDOS protection part 3: Monitoring" href="http://itschr.is/?p=176">see here</a>.)</p>
+<p>We're going to add a simple php script on our minecraft server that queries the number of players online, then return this value to the zabbix server by adding it ot the agent as a UserParameter.</p>
+<h2>Adding the PHP:</h2>
+<p>No point in reinventing the wheel, so we're going to grab &nbsp;xPaw's MinecraftQuery.class.php <a href="https://github.com/xPaw/PHP-Minecraft-Query">from here</a>&nbsp;and save it on the minecraft server as "MinecraftQuery.class.php"<a href="https://github.com/xPaw/PHP-Minecraft-Query/blob/master/MinecraftQuery.class.php"><br />
+</a></p>
+<p>Then we need to add our own file which uses this one, queries our server ip and port, and returns the number:</p>
+<blockquote><p><?php<br />
+require_once('MineCraftQuery.class.php');</p>
+<p>$Query = new MinecraftQuery( );</p>
+<p>try<br />
+{<br />
+//$arg[1] is the argument passed in when calling the php, in this case the port<br />
+$Query->Connect( '127.0.0.1', $argv[1] );</p>
+<p>$result = $Query->GetInfo( );</p>
+<p>echo $result["Players"];<br />
+}<br />
+catch( MinecraftQueryException $e )<br />
+{<br />
+//return 0 if something goes wrong<br />
+echo 0;<br />
+}</p>
+<p>unset($Query);<br />
+unset($result);<br />
+?></p></blockquote>
+<p>Now we add a custom user parameter to the bottom of /etc/zabbix/zabbix_agentd.conf :</p>
+<blockquote><p>UserParameter=minecraft.players[*],php /home/mc/ServerQuery.php $1</p></blockquote>
+<p>The first part is the key to identify the item in zabbix server: the * in brackets tells the agent to use the values that the server is sending in place of any numbers prepended with $. This means with a single UserParameter on the agent, we can query multiple minecraft servers from the zabbix server, simply by passing a different port in with the trigger. The second part is the command to run our script, change it to match your script's path.</p>
+<p>Finally, on the server we need to reload the zabbix agent so it know about the new key:</p>
+<blockquote><p>/etc/init.d/zabbix-agent restart</p></blockquote>
+<h2>Adding the Host Item</h2>
+<p>In the zabbix web interface, go to configuration -> Hosts, select your minecraft server and go to Item -> Create Item.</p>
+<p>For the key, enter the key you used as a UserParamter, but replace the * with the server query port.</p>
+<p>Thats all you need to do to add the item, but to make it a bit neater you can set the Units to "players" and create a new application group such as "minecraft players"</p>
+<p>Here's mine:</p>
+<p><a href="http://itschr.is/wp-content/uploads/2014/03/Capture5.png"><img class="alignnone size-full wp-image-197" alt="Capture" src="http://itschr.is/wp-content/uploads/2014/03/Capture5.png" width="584" height="781" /></a></p>
+<p>Repeat the above for any extra servers you have, and add all of the items to a graph to display them together (see part 1 for more on graphs) You should end up with something like this:</p>
+<p><a href="http://itschr.is/wp-content/uploads/2014/03/Capture6.png"><img class="alignnone size-full wp-image-207" alt="Capture" src="http://itschr.is/wp-content/uploads/2014/03/Capture6.png" width="819" height="416" /></a></p>
+<p>To link externally to your graphs you need to enable guest readonly access, and use the following address:</p>
+<p>http://mydomain.com/zabbix/chart2.php?graphid=<graphID></p>
+<p>(you can find the graph ID in the URL when you are configuring the graph)</p>

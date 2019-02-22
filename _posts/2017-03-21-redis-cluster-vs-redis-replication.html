@@ -1,0 +1,32 @@
+---
+layout: post
+status: publish
+published: true
+title: Redis Cluster vs Redis Replication
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 315
+wordpress_url: https://itschr.is/?p=315
+date: '2017-03-21 11:51:54 +0000'
+date_gmt: '2017-03-21 11:51:54 +0000'
+categories:
+- Uncategorized
+- Coding
+- Linux
+- redis
+tags: []
+comments: []
+---
+<p>While researching Redis Cluster I found a large number of tutorials on the subject that confused Replication and Cluster, with people setting up 'replication' using cluster but no slaves, or building a 'cluster' only consisting of master-slave databases with no cluster config.</p>
+<p>So to clear things up:</p>
+<h4>Replication</h4>
+<p>Replication involves a master server which serves&nbsp;reads and writes, and duplicates all data to one or more slave servers (which serves reads but not writes). Slaves can be used to replace a master in case of failure, spread read request load, or to perform backups of the database to reduce load on the master.</p>
+<h4>Cluster</h4>
+<p>Clusters are used when you have more data than RAM in a single machine: the data is automatically split (based on the key) across multiple databases, increasing the amount of data you can store. Clients requesting a key from any cluster node will be redirected to the node holding the key, and are expected to learn the locations of keys to reduce the number of redirects.</p>
+<h4>Replicaton + Cluster</h4>
+<p>Redis Cluster supports replication by adding slaves to existing nodes, if a master becomes unreachable then its slave will be promoted to master.</p>
+<h4>Sentinel</h4>
+<p>Last but not least, Redis Sentinel can be used to manage replicated servers (not clustered, see below.) Clients connect to a Sentinel and request a master or slave to communicate with, the sentinels handle health checks of the masters/slaves, and will automatically promote a slave if a master is unreachable. You need to have at least 3 sentinels running so that they can agree on reachability of nodes, and to ensure the sentinels aren't a single point of failure.</p>
+<p>Cluster handles its own promotion and does not need Sentinel in front of it.</p>

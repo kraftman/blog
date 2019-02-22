@@ -1,0 +1,27 @@
+---
+layout: post
+status: publish
+published: true
+title: 'Installing Luasec part 2: Failed loading manifest'
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 312
+wordpress_url: https://itschr.is/?p=312
+date: '2016-12-29 11:04:52 +0000'
+date_gmt: '2016-12-29 11:04:52 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<h2>Problem</h2>
+<p>Tried to install LuaSec on a new machine recently and got the following error:</p>
+<p style="padding-left: 30px;">luarocks install luasec<br />
+Warning: Failed searching manifest: Failed loading manifest: Failed fetching manifest for http://luarocks.org/repositories/rocks - Error fetching file: Failed downloading http://luarocks.org/repositories/rocks/manifest - URL redirected to unsupported protocol - install luasec to get HTTPS support.</p>
+<p>So all I need to do to install LuaSec is install LuaSec first, &nbsp;brilliant!</p>
+<h2>Solution</h2>
+<p>One solution is buried here https://github.com/luarocks/luarocks-site/issues/6</p>
+<p>and is to specify the server directly:</p>
+<p style="padding-left: 30px;">luarocks install --only-server=http://rocks.moonscript.org luasec</p>

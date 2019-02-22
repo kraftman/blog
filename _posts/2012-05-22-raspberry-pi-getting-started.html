@@ -1,0 +1,45 @@
+---
+layout: post
+status: publish
+published: true
+title: Raspberry Pi getting started.
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 18
+wordpress_url: http://itschr.is/?p=18
+date: '2012-05-22 05:06:00 +0000'
+date_gmt: '2012-05-22 05:06:00 +0000'
+categories:
+- Linux
+- Raspberry Pi
+tags:
+- raspi
+- raspberry pi
+- thin client
+- remote desktop
+comments: []
+---
+<div dir="ltr">Finally got my Raspberry Pi today. Installation went surprisingly well, only issue was my complete lack of experience with Linux.</p>
+<p>I wanted to try out a few different things with the RPi, the first of which was its&nbsp;feasibility&nbsp;as a thin client. After some quick googling I discovered rdesktop, a program to connect into windows remote desktop sessions.</p>
+<p>Here was my first stumbling block, it seem that I needed root&nbsp;privileges&nbsp;to install things, and I had no idea what the password was. Turns out that's because there was no password, and I needed to set it using:</p>
+<p>"sudo passwd root"</p>
+<p>Ace.</p>
+<p>So I installed rdesktop, ran it, and fairly painlessly logged into my windows remote desktop.<br />
+The next issue was the program resolution, which I discovered can quite easily be changed by either specifying a percentage ("-g 90%") or using fullscreen ("-f") tags after the server location.</p>
+<p>The raspberry pi itself, however, was not using the full resolution of the screen.</p>
+<p>After yet more searching, I discovered that the correct mode can be found by typing</p>
+<p>"/opt/vc/bin/tvservice &ndash;m DMT"</p>
+<p>And finding the one that matches your resolution.<br />
+This mode can then be added to /boot/config.txt (create it if it isn't there) as:</p>
+<p>"hdmi_mode=58"</p>
+<p>Changing 58 to your relevant mode found from the above list.</p>
+<div>This, unfortunately, didn't solve anything, and I still had large black borders around my screen.</div>
+<div></div>
+<div>After some desperation, I finally added "disable_overscan = 1" to the config file, and low and behold, despite having no other overscan&nbsp;parameters&nbsp;defined, it worked!</div>
+<div></div>
+<div>Turns out either rdesktop or the RPi is quite laggy, so I'll be testing a few other programs next.</div>
+<div></div>
+<p>&nbsp;</p>
+</div>

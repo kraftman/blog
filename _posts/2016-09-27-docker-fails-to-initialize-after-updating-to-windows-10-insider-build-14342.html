@@ -1,0 +1,22 @@
+---
+layout: post
+status: publish
+published: true
+title: Docker fails to initialize after updating to Windows 10 insider build 14342
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 274
+wordpress_url: http://itschr.is/?p=274
+date: '2016-09-27 21:25:50 +0000'
+date_gmt: '2016-09-27 21:25:50 +0000'
+categories:
+- Coding
+tags: []
+comments: []
+---
+<h4>Problem:</h4>
+<p>Docker for windows hates windows insider, it attempts to create a switch that already exists (DockerNAT) and then fails because it already exists.</p>
+<h4>Solution:</h4>
+<p>There are a few suggestions <a href="https://forums.docker.com/t/docker-fail-to-initialize-after-updating-to-windows-10-insider-build-14342/11896/2">here</a> but the one that worked for me was to open hyper v manager, then go to virtual switch manager, and rename the existing 'DockerNAT' switch to something else, then reinstall Docker.</p>

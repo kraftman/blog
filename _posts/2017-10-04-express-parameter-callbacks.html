@@ -1,0 +1,26 @@
+---
+layout: post
+status: publish
+published: true
+title: Express parameter callbacks
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 418
+wordpress_url: https://itschr.is/?p=418
+date: '2017-10-04 04:15:42 +0000'
+date_gmt: '2017-10-04 04:15:42 +0000'
+categories:
+- Uncategorized
+- Coding
+- Javascript
+- node
+tags: []
+comments: []
+---
+<p>Handy little feature I didn't know about in Express:<br />
+Using <a href="https://expressjs.com/en/4x/api.html#app.param">app.param([name], callback)</a> you can bind callbacks directly to route parameters, allowing you to move common preprocessing/validation out of each function that uses the parameter, and into a single function (without having to call it explicitly each time.)<br />
+You can pass in an array of names, using next() to jump to the next parameter, and the callback is only called once regardless of how many times the parameter appears in route handlers.<br />
+The callbacks are local to the router they are defined on, so you can handle things (or not) differently based on the context.<br />
+Neat!</p>

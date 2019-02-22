@@ -1,0 +1,26 @@
+---
+layout: post
+status: publish
+published: true
+title: NGINX Timer Resolution
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 350
+wordpress_url: https://itschr.is/?p=350
+date: '2017-06-16 11:01:55 +0000'
+date_gmt: '2017-06-16 11:01:55 +0000'
+categories:
+- Coding
+- nginx
+- Lua
+tags: []
+comments: []
+---
+<p>Using <a href="https://github.com/openresty/lua-nginx-module#ngxtime">ngx.time</a>&nbsp;or <a href="https://github.com/openresty/lua-nginx-module#ngxnow">ngx.now&nbsp;</a>is encouraged over using Lua's built in functions because they use the cached time rather than performing a syscall, but how often is the cache updated?</p>
+<p>After a bit of a dig, it turns out there's no absolute answer, because the cache is actually updated when a kernel event fires:</p>
+<blockquote><p>It can be set manually using nginx's timer_resolution<br />
+http://nginx.org/en/docs/ngx_core_module.html#timer_resolution<br />
+but this is not recommended because it either causes too many syscalls if set too low, or necessary time lag if set too high.</p></blockquote>
+<p><a href="https://groups.google.com/d/msg/openresty-en/OdNzfh8rlzk/EQHF-hlhlQ0J">https://groups.google.com/d/msg/openresty-en/OdNzfh8rlzk/EQHF-hlhlQ0J</a></p>

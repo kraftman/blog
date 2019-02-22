@@ -1,0 +1,27 @@
+---
+layout: post
+status: publish
+published: true
+title: Hide 'attempt to remove non jni...' logcat spam
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 251
+wordpress_url: http://itschr.is/?p=251
+date: '2015-12-27 21:28:36 +0000'
+date_gmt: '2015-12-27 21:28:36 +0000'
+categories:
+- Coding
+- Android
+tags: []
+comments: []
+---
+<h4>Problem:</h4>
+<p>Tonnes of logcat spam in Eclipse 'attempt to remove non jni local reference'</p>
+<h4>Solution:</h4>
+<p>edit filter configuration</p>
+<p>^(?!.*(non-JNI)).*$</p>
+<p>&nbsp;</p>
+<p>From&nbsp;http://stackoverflow.com/questions/16017356/how-to-hide-remove-filter-logs-in-the-logcat-in-eclipse-for-android</p>
+<p>&nbsp;</p>

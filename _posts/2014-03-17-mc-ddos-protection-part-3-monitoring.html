@@ -1,0 +1,113 @@
+---
+layout: post
+status: publish
+published: true
+title: 'MC DDOS protection part 3: Monitoring'
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 176
+wordpress_url: http://itschr.is/?p=176
+date: '2014-03-17 23:09:47 +0000'
+date_gmt: '2014-03-17 23:09:47 +0000'
+categories:
+- Linux
+- Minecraft
+tags: []
+comments: []
+---
+<p>So now our tunnels are set up, our round-robin SRV records are distributing our players across our VPS's, next it would be nice if we could check the traffic passing across them, and also keep an eye on the system stats for each machine.</p>
+<p>In this section we're going to look at the basic structure of Zabbix, the terminology, and adding custom graphs.</p>
+<h1>Basics</h1>
+<p>Zabbix is made up of 3 parts:</p>
+<h5>Server Core</h5>
+<ul>
+<li>Receives and processes stats from each server</li>
+<li>Stores the data</li>
+<li>Can send alerts based on certain criteria ("triggers")</li>
+</ul>
+<h5>Server Web Interface</h5>
+<ul>
+<li>Displays graphs and information about the servers</li>
+<li>Can be on a separate machine from the core</li>
+</ul>
+<h5>Zabbix Agent</h5>
+<ul>
+<li>Runs on each of the servers you want to monitor</li>
+<li>Reports the servers status to Zabbix</li>
+<li>Can be customised with extra scripts</li>
+</ul>
+<h3></h3>
+<h2>Installing zabbix core and web interface</h2>
+<p>To install Zabbix you will need a webserver and a mysql database. Your webserver can be on another machine to the one you're installing zabbix server on, you just need to tell it where during the configuration.</p>
+<p>Zabbix has some good documentation so I won't re-write it, the version I used is <a href="https://www.zabbix.com/documentation/2.0/manual/installation/install_from_packages">here</a>&nbsp;but feel free to use a later release, the only thing that's important is that you don't use the default from the apt repository: it will most likely be < v2.0 and not support interface auto discovery properly.</p>
+<p>You will also need to enable access to port 10051 incoming to your zabbix server, either through your firewall or its iptables.</p>
+<h2>Installing zabbix agent on your servers</h2>
+<p>As above: add the repository, update, &nbsp;and "apt-get install zabbix-agent".</p>
+<p>Few extra notes:</p>
+<ul>
+<li>Make sure you're on a version later than 2.0 with "zabbix-agent --version"</li>
+<li>Change "Server=127.0.0.1" in /etc/zabbix/zabbix_agentd.conf to your zabbix server IP</li>
+<li>Restart the agent with "/etc/init.d/zabbix_agentd restart"</li>
+<li>Allow port 10050 through iptables with "&nbsp;iptables -A INPUT -p tcp --dport 10050 -j ACCEPT"</li>
+</ul>
+<h2>Host Configuration</h2>
+<p>Assuming you've now installed Zabbix and aren't screaming at me for not including more detail, you're probably now staring at the web GUI wondering where to start. Here are the basic terms you need to know:</p>
+<p>Items</p>
+<ul>
+<li>Measure a specific value on the server, e.g. CPU load</li>
+</ul>
+<p>Applications</p>
+<ul>
+<li>Group Items into categories, e.g. "OS Memory" = all memory items.</li>
+</ul>
+<p>Discovery Rules</p>
+<ul>
+<li>Auto-generate new items by scanning the system for extra hard drives, interfaces, etc.</li>
+</ul>
+<p>Triggers</p>
+<ul>
+<li>Perform an event when an item matches certain criteria, e.g. send an email when CPU load exceeds 100%</li>
+</ul>
+<p>Graphs</p>
+<ul>
+<li>Self explanatory, graph an item or set of items on a host.</li>
+</ul>
+<p>Screens</p>
+<ul>
+<li>Can be used to create a page with multiple graphs.</li>
+</ul>
+<p>Templates</p>
+<ul>
+<li>Group all of the above together into a package that can be easily added to a new host with minimal extra configuration.</li>
+</ul>
+<h4></h4>
+<h4>Add new host</h4>
+<p>New hosts can be added via configuration > Hosts > Create host</p>
+<p>Give the host a descriptive name, add it to "linux servers" group, and enter it's IP address. You then need to add a template to tell it what to monitor. "Template OS Linux" covers everything we need for our VPS, including an interface discovery script for our GRE tunnels.</p>
+<p>Save your new host, and go back to Configuration > Hosts. After a few minutes you should see Status: Monitored and a green Z icon indicating that everything is fine.</p>
+<p>If you have a grey icon, you may have not added any templates (hence nothing to monitor.</p>
+<p>If there is a red icon then there is most likely an issue with communication to the host, hover over the red icon to see the details, check that your firewall rules are allowing the correct ports, and that the IP's are correct.</p>
+<h3></h3>
+<h3>Graphing:</h3>
+<p>If you navigate to Monitoring > Graphs and select your new host. &nbsp;There should be a graph available with a name like "Network traffic on gre1", which if you have any players connected will look something like this:</p>
+<p><a href="http://itschr.is/wp-content/uploads/2014/03/Capture4.png"><img class="alignnone size-full wp-image-189" alt="Capture" src="http://itschr.is/wp-content/uploads/2014/03/Capture4.png" width="881" height="353" /></a></p>
+<p>Using this page when can now switch between each host we've added and view the bandwidth usage on each interface. Great start, but it would be nice if we could combine the information into one place, which we'll do with a custom graph.</p>
+<h4>Creating a custom graph</h4>
+<p>Since our MC server host has an interface for each tunnel, we can add each item for each tunnel onto a new custom graph:</p>
+<p>Go to Configuration > Hosts and select "Graphs" on the entry for your MC server.</p>
+<p>Select "Create Graph" in the top right corner.</p>
+<p>You can leave everything default except the name and the Items.</p>
+<p>Select "add items" and then select each incoming and outgoing item for your GRE interfaces. You can change any colours you want, and preview your changes in the preview tab.</p>
+<p>Once you're happy with the result, save the result and your new graph should appear under Monitoring > Graphs.</p>
+<p><a href="http://itschr.is/wp-content/uploads/2014/03/Capture3.png"><img class="alignnone size-full wp-image-187" alt="Capture" src="http://itschr.is/wp-content/uploads/2014/03/Capture3.png" width="925" height="533" /></a></p>
+<h4>Screens</h4>
+<p>Depending on how many VPS's you have and which interfaces you have selected, your graph may look a bit messy, even with some custom colours assigned to interfaces. Another option is to use a screen to display the data, with each interfaces as a separate graph, but all on the same page.</p>
+<p>To do this go to Configuration > Screens and "Create Screen."</p>
+<p>Give it a name and decide an initial size, you can change it later.</p>
+<p>Save it and it should appear in the list of screens: select your screen and you will be presented with a grid and an option to change the data for each one.</p>
+<p>Select the data you want and you're done, you can now view your new screen under Monitoring > Screens:</p>
+<pre><a href="http://itschr.is/wp-content/uploads/2014/03/Capture.png"><img class="alignnone size-large wp-image-177" alt="Capture" src="http://itschr.is/wp-content/uploads/2014/03/Capture-1024x703.png" width="1024" height="703" /></a></pre>
+<p>And we're done for now. Thanks for reading, next up: traffic shaping on our VPS's</p>
+<pre></pre>

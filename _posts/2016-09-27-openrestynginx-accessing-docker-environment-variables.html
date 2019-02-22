@@ -1,0 +1,25 @@
+---
+layout: post
+status: publish
+published: true
+title: Openresty/NGINX accessing Docker environment variables
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 280
+wordpress_url: https://itschr.is/?p=280
+date: '2016-09-27 21:10:41 +0000'
+date_gmt: '2016-09-27 21:10:41 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<h4>Problem:</h4>
+<p>Docker supports passing in environment variables to your containers as a handy way to easily switch environments when using multiple docker-compose files. For example you may have a base docker-compose.yml with a docker-compose.dev.yml and docker-compose.prod.yml file that specify environment variables for database hostnames/credentials.<br />
+The issue is simply accessing these environment variables directly isn't possible in openresty (e.g. using os.getenv()).</p>
+<h4>Solution:</h4>
+<p>The issue is caused by NGINX <a href="http://nginx.org/en/docs/ngx_core_module.html#env">blocking all environment variables</a> by default. To make them accessible again you need to re-define them in your nginx.conf, but with no values, e.g:</p>
+<p>env APP_ENV;</p>
+<p>You should then be able to access them as normal.</p>

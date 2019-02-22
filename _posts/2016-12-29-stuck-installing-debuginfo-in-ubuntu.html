@@ -1,0 +1,28 @@
+---
+layout: post
+status: publish
+published: true
+title: Stuck installing debuginfo in Ubuntu
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 322
+wordpress_url: https://itschr.is/?p=322
+date: '2016-12-29 11:01:03 +0000'
+date_gmt: '2016-12-29 11:01:03 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<h2>Problem:</h2>
+<p>To run systemtap you need debuginfo, but it fails when installing linux image with :</p>
+<p style="padding-left: 30px;">apt-get source linux-image-4.4.0-53-generic-dbgsym<br />
+Reading package lists... Done<br />
+Picking 'linux' as source package instead of 'linux-image-4.4.0-53-generic-dbgsym'</p>
+<p>And then fails to find 'linux'</p>
+<h2>Solution:</h2>
+<p>Solution is to uncomment 'deb-src' in /etc/apt/sources.list, run apt-update again, and then</p>
+<p style="padding-left: 30px;">
+sudo apt-get build-dep --no-install-recommends linux-image-$(uname -r)</p>

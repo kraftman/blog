@@ -1,0 +1,23 @@
+---
+layout: post
+status: publish
+published: true
+title: Controllers are the gatekeepers of your API
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 435
+wordpress_url: https://itschr.is/?p=435
+date: '2018-02-06 08:07:03 +0000'
+date_gmt: '2018-02-06 08:07:03 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<p>Controllers safely separate your API from the outside world; they parse and sanitise data that comes in, and they filter the data you return.<br />
+For this reason, you shouldn't do any input validation past your controllers: if it doesn't exist by that point then something has gone wrong, and you should fix the code instead of adding hundreds of validations.</p>
+<p>If your endpoint requires an account ID with your request and the user doesn't pass it in, that's a user error and you should handle it by validating the input and rejecting the request.<br />
+If your internal code requires an account ID and gets called without it however, that's an error with your code, and your code should fail, rather than specifically checking for it and handling it in every single function it may occur.</p>
+<p>For the same reason, controllers should abstract the request information from the rest of the code, and should be the last point in your code that you ever see the request object. Internal code beyond the controllers should have no concept of a request, only the values parsed in.</p>

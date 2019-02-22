@@ -1,0 +1,32 @@
+---
+layout: post
+status: publish
+published: true
+title: Openresty Redis ZUNIONSTORE gotcha
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 390
+wordpress_url: https://itschr.is/?p=390
+date: '2017-06-16 10:49:52 +0000'
+date_gmt: '2017-06-16 10:49:52 +0000'
+categories:
+- Coding
+- redis
+- Lua
+tags: []
+comments: []
+---
+<h3>Problem</h3>
+<p><a href="https://redis.io/commands/zunionstore">ZUNIONSTORE</a>&nbsp;merges multiple sorted sets into one, and stores the result under the key specified. Since the number of keys can vary and there are more parameters after the keys, it require the numkeys parameter to be specified before the keys.</p>
+<p>If using the default aggregate function (SUM) this is fine, as you can simply store the sorted set names to be merged in a table, use the size of the table as numkeys, and unpack() the table to pass all of the keys names to redis.</p>
+<p>The problem occurs when you want to change the aggregate function, adding more parameters after unpack(), which changes its behaviour:</p>
+<p><a href="http://www.lua.org/pil/5.1.html">http://www.lua.org/pil/5.1.html</a><br />
+'Lua always adjusts the number of results from a function to the circumstances of the call. When we call a function as a statement, Lua discards all of its results. When we use a call as an expression, Lua keeps only the first result. We get all results only when the call is the last (or the only) expression in a list of expressions.'</p>
+<p>So unpack will only pass the first sorted set key name.</p>
+<h3>Solution</h3>
+<p>The workaround is to add the aggregate command to the list of sorted set key names, and deduct the number of keys passed:</p>
+<blockquote><p>table.insert(setNames, 'AGGREGATE')<br />
+table.insert(setNames, 'MAX')<br />
+local ok, err = red:zunionstore('destinationKey',#setNames-2,unpack(setNames))</p></blockquote>

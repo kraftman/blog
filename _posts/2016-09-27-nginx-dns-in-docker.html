@@ -1,0 +1,25 @@
+---
+layout: post
+status: publish
+published: true
+title: NGINX DNS in docker
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 278
+wordpress_url: https://itschr.is/?p=278
+date: '2016-09-27 20:59:50 +0000'
+date_gmt: '2016-09-27 20:59:50 +0000'
+categories:
+- Coding
+- Linux
+- nginx
+tags: []
+comments: []
+---
+<h4>Problem:</h4>
+<p>Docker runs its own container DNS that means you can easily link containers together just by specifying their names, instead of having to work out their dynamically assigned IP's somehow. Unfortunately NGINX doesn't read the /etc/hosts file that docker edits, and so can't resolve hostnames of other containers.</p>
+<h4>Solution:</h4>
+<p>An earlier hacky solution was to bundle dnsmasq in with nginx and have it use 127.0.0.1 as a resolver, violating the <a href="https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/#/run-only-one-process-per-container">one process per container</a> best practice. </p>
+<p>As of Docker 1.10 you can use the new <a title="Docker Embedded DNS" href="https://docs.docker.com/engine/userguide/networking/configure-dns/">embedded DNS</a> feature by setting 127.0.0.11 as the resolver in nginx.conf, just be aware that there are <a title="stackoverflow nginx doesnt resolve docker DNS" href="http://stackoverflow.com/questions/35471967/nginx-doesnt-get-host-from-embedded-dns-in-docker-1-10-1">issues with IPv6.</a></p>

@@ -1,0 +1,139 @@
+---
+layout: post
+status: publish
+published: true
+title: 'Minecraft DDOS protection part 1: GRE Tunnels'
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 145
+wordpress_url: http://itschr.is/?p=145
+date: '2014-03-16 23:54:20 +0000'
+date_gmt: '2014-03-16 23:54:20 +0000'
+categories:
+- Coding
+- Minecraft
+tags: []
+comments:
+- id: 1570
+  author: how create multiple gre tunnels with 1 main server? (for proxy) | TUTNEW
+  author_email: ''
+  author_url: http://tutnew.com/how-create-multiple-gre-tunnels-with-1-main-server-for-proxy-2/
+  date: '2015-04-20 05:47:36 +0000'
+  date_gmt: '2015-04-20 05:47:36 +0000'
+  content: "[&#8230;] was follow this guide : http://itschr.is/?p=145, and it works
+    perfect like i need. But i want to add more proxies, and i can&#8217;t understand
+    [&#8230;]"
+- id: 1637
+  author: Florin
+  author_email: cacat83@gmail.com
+  author_url: ''
+  date: '2015-10-28 16:50:08 +0000'
+  date_gmt: '2015-10-28 16:50:08 +0000'
+  content: "Hi,\r\n\r\nOK I saw this tut on a lot of websites .. the one i`m looking
+    and I cant find is to make a GRE tunnel between a linux and a windows server.\r\n\r\nI
+    have my mc server running on windows server and I could get a protected vps on
+    linux.\r\nThe problem is the tunnel between them :)\r\n\r\nAny idea ?"
+- id: 1652
+  author: www.Jamd-linux.com
+  author_email: tiffinymccue@inbox.com
+  author_url: http://www.Jamd-linux.com/how-to-record-skype-calls-with-talkhelper-on-windows/
+  date: '2016-05-25 10:58:08 +0000'
+  date_gmt: '2016-05-25 10:58:08 +0000'
+  content: "Yeah my bad, it can require you to utilize the 3CX as \r\nyour PBX host,
+    I I will mentioned that."
+- id: 1662
+  author: Minecraft Server List
+  author_email: VelazcoSivret312@gnumail.com
+  author_url: http://minebrowse.com/
+  date: '2016-06-22 15:21:37 +0000'
+  date_gmt: '2016-06-22 15:21:37 +0000'
+  content: "&hellip;&hellip;you know what, maybe I&rsquo;ll blow up your house and
+    leave a sign that says, &ldquo;Courtesy of the Ventrue &lsquo;Hit Squad'&rdquo;"
+- id: 1673
+  author: Zac
+  author_email: aestyr@hotmail.com
+  author_url: ''
+  date: '2016-08-22 11:42:42 +0000'
+  date_gmt: '2016-08-22 11:42:42 +0000'
+  content: Hey, I am getting the error "bad argument -dport". Help please!
+- id: 1678
+  author: Independent Contractor Discretionary Function And Misrepresentation Function
+  author_email: jeannawhiteman@googlemail.com
+  author_url: http://www.hotelsaccommodation.com.au
+  date: '2016-09-02 01:26:57 +0000'
+  date_gmt: '2016-09-02 01:26:57 +0000'
+  content: Individual Harm Lawyer in Maryland Site
+---
+<p>Chiisana from&nbsp;<a href="http://reddit.com/r/admincraft">/r/admincraft</a>&nbsp;has a really nice write-up about basic DDOS protection&nbsp;<a href="http://www.andyhuang.net/blog/2013/02/ddos-protection-for-minecraft-servers.html">here</a>, so rather than rehashing it I'll just write a brief summary and then continue to extend the ideas a little, covering&nbsp;GRE Tunnels, Zabbix monitoring, and DNS automation with Cloudflare.</p>
+<p><strong>Basic Idea</strong></p>
+<p>When dealing with a Denial of Service by sheer bandwidth, by the time the traffic hits our server it's already too late: no amount of shaping or blocking will change the fact that our link is saturated. To protect it, we sit a few cheap VPS's between the players and the server and limit the bandwidth before it hits our server. The players are distributed between VPS's using round robin DNS, and if attackers saturate one VPS link, the others will still remain up.</p>
+<p><strong>Adding GRE Tunnels</strong></p>
+<p>Rather than using tcptunnel, I'm using GRE tunnels, so that the minecraft server gets the IP of the player connecting, and not the VPS IP.</p>
+<p>The&nbsp;<a href="http://wiki.buyvm.net/doku.php/gre_tunnel">BuyVM guide</a>&nbsp;is a good start for setting up a GRE tunnel, but it mixes up the VPS and server commands a little, and doesn't really explain what the commands are doing.</p>
+<p><strong>VPS commands:</strong></p>
+<blockquote><p>echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf</p>
+<p>iptunnel add gre1 mode gre local VPS_GLOBAL_IP remote MC_GLOBAL_IP ttl 255</p>
+<p>ip addr add 192.168.10.2/30 dev gre1<br />
+ip link set gre1 up</p>
+<p>iptables -t nat -A POSTROUTING -s 192.168.10.0/30 -j SNAT --to-source VPS_GLOBAL_IP<br />
+iptables -t nat -A PREROUTING -p tcp -d VPS_GLOBAL_IP --dport 25565 -j DNAT --to-destination 192.168.10.1:25565<br />
+iptables -A FORWARD -p tcp -d 192.168.1.1 --dport 25565 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT</p></blockquote>
+<p><strong>Breakdown</strong></p>
+<ul>
+<li>echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf</li>
+</ul>
+<p>This&nbsp;<a href="http://www.ducea.com/2006/08/01/how-to-enable-ip-forwarding-in-linux/">enables IP forwarding</a>, and only needs to be run once.</p>
+<ul>
+<li>iptunnel add gre1 mode gre local VPS_GLOBAL_IP remote MC_GLOBAL_IP ttl 255</li>
+</ul>
+<p>This creates a new tunnel interface with the name "gre1", with type set to "gre", &nbsp;local and remote IP's defining the tunnel endpoints.</p>
+<ul>
+<li>ip addr add 192.168.10.2/30 dev gre1</li>
+</ul>
+<p>We then give the interface a private IP address used to communicate with the interface on the other end of the tunnel.</p>
+<ul>
+<li>ip link set gre1 up</li>
+</ul>
+<p>Bring the interface up, it should now be listed when running "ifconfig"</p>
+<ul>
+<li>iptables -t nat -A POSTROUTING -s 192.168.10.0/30 -j SNAT --to-source VPS_GLOBAL_IP</li>
+</ul>
+<p>Re-write the source IP of all packets coming from our tunnel out to the players to the global IP of the VPS</p>
+<ul>
+<li>iptables -t nat -A PREROUTING -p tcp -d VPS_GLOBAL_IP --dport 25565 -j DNAT --to-destination 192.168.10.1:25565</li>
+</ul>
+<p>Change the destination port and IP of the packets incoming from the VPS's global IP to the other end of the tunnel</p>
+<ul>
+<li>iptables -A FORWARD -p tcp -d 192.168.10.1 --dport 25565 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT</li>
+</ul>
+<p>Finally we re-route the traffic down our GRE tunnel to the MC server.</p>
+<p><strong>MC Server commands:</strong></p>
+<blockquote><p>iptunnel add gre1 mode gre local MC_GLOBAL_IP remote VPS_GLOBAL_IP ttl 255<br />
+ip addr add 192.168.10.1/30 dev gre1<br />
+ip link set gre1 up</p>
+<p>echo '101 ATGRE' >> /etc/iproute2/rt_tables<br />
+ip rule add from 192.168.10.0/30 table ATGRE<br />
+ip route add default via 192.168.10.2 table ATGRE</p></blockquote>
+<p><strong>Breakdown</strong></p>
+<p>The first block is just the same as for the VPS except the IP's are swapped round; remember not to use a subnet that conflicts with your LAN subnet.</p>
+<ul>
+<li>echo '101 GRETUN' >> /etc/iproute2/rt_tables</li>
+</ul>
+<p>Linux has a pretty powerful set of routing features, in this case allowing us to define multiple routing tables so that we can define some source routing policies.&nbsp;This command adds a new routing table into rt_tables, that we can use to add some rules specific to our tunnel.</p>
+<ul>
+<li>ip rule add from 192.168.10.0/30 table GRETUN</li>
+</ul>
+<p>Tell our system that all traffic from 192.168.10.0/30 will be dealt with by our "GRETUN" routing table.</p>
+<ul>
+<li>ip route add default via 192.168.10.2 table ATGRE</li>
+</ul>
+<p>Send any traffic from our&nbsp;192.168.10.0/30 subnet (that we have no route for) to the other end of our tunnel, the VPS.</p>
+<p>Once your happy with your config, you can add it to /etc/rc.local so that it runs each time the system boots. This means you can change it easily simply by restarting.</p>
+<p>Notes:</p>
+<ul>
+<li>If your MC server is sitting behind a firewall and has no global IP, you can use 0.0.0.0 as the MC IP in the MC server config, point your VPS's tunnel to your firewall's global IP, and set up the firewall to pass gre traffic through to your MC server.</li>
+<li>For any other services sitting on the same machine as the MC server, you can simply duplicate the iptables rules on the VPS, replacing the ports and protocol with that of your other service.</li>
+<li>Since my website sits on a different machine behind the firewall, I'm going to use Cloudflare to mask it's IP, which I'll cover later on.</li>
+</ul>

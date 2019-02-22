@@ -1,0 +1,25 @@
+---
+layout: post
+status: publish
+published: true
+title: RAID on Intel servers
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 15
+wordpress_url: http://itschr.is/?p=15
+date: '2012-10-14 04:39:00 +0000'
+date_gmt: '2012-10-14 04:39:00 +0000'
+categories:
+- Linux
+tags: []
+comments: []
+---
+<div dir="ltr">Managed to source a couple of 750gb drives for my server, thought I'd drop them in and run RAID 1, but as usual I faced a number of&nbsp;difficulties:Drives didn't show up.<br />
+The drives didn't show up after I plugged them in, turns out the server doesn't support hot swapping so I had to go and reboot it, while I was there I checked out the BIOS to make sure the ports weren't disabled and to enable RAIDCan't access the RAID ROM<br />
+So this server has an&nbsp;Intel&nbsp;board which has an option in the BIOS to enable RAID on the SATA drives, however after enabling it I couldn't find any way to actually access the RAID manager, it just went straight to trying to network boot. Turns out that to see the RAID ROM you have to disable Intel Quiet boot in the BIOS first.</p>
+<p>Can't boot from the none RAIDed drive.<br />
+So I finally got into the RAID manager, set the two new disks to RAID 1, and restarted. Then I remember that I'd need to set it to boot from RAID in the BIOS, and then choose a boot disk from the RAID ROM. Problem with this is you can't select the none RAIDed drive as it isn't a virtual disk, and the only way to make it a virtual disk is to add it to an array. Strangely enough the way to get it working was to set the disk up as a single disk RAID 0 array, and then I could select it as the boot drive.</p>
+<p>All this turned out to be in vain as not only was Linux unable to observe the drives as a single RAID array, instead seeing them as&nbsp;separate&nbsp;drives, but the second of the two drives was also dying and useless. Woop!</p>
+</div>

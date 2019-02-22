@@ -1,0 +1,22 @@
+---
+layout: post
+status: publish
+published: true
+title: MineOS on KVM
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 16
+wordpress_url: http://itschr.is/?p=16
+date: '2012-10-08 13:12:00 +0000'
+date_gmt: '2012-10-08 13:12:00 +0000'
+categories:
+- Linux
+- Minecraft
+tags:
+- kvm
+- mineos
+comments: []
+---
+<div dir="ltr">So after about an hour of trying to work out why I couldn't see any ethernet adapters in my new Minecraft virtual machine, I eventually discovered that it's a problem with MineOS not supporting the para-virtualised network adapter that KVM provides. The fix for this was to change the adapter from virtio to e1000, for some reason rtl8139 doesn't work despite being pretty well supported.</div>

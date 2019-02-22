@@ -1,0 +1,24 @@
+---
+layout: post
+status: publish
+published: true
+title: Syntax error sending emails with Lua and Gmail
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 236
+wordpress_url: http://itschr.is/?p=236
+date: '2015-07-17 20:23:46 +0000'
+date_gmt: '2015-07-17 20:23:46 +0000'
+categories:
+- Uncategorized
+tags: []
+comments: []
+---
+<p>Got a fairly unhelpful error while trying to send an email&nbsp;using LuaSec and LuaSocket to connect to googles SMTP&nbsp;servers:</p>
+<blockquote><p>555 5.5.2 Syntax error. uc3sm9880237wib.2</p></blockquote>
+<p>Turns out google doesn't like the recipient format</p>
+<blockquote><p>'FirstName LastName <name@example.com>'</p></blockquote>
+<p>and instead prefers just</p>
+<blockquote><p>'<name@example.com>'</p></blockquote>

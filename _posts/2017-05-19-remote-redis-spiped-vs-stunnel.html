@@ -1,0 +1,48 @@
+---
+layout: post
+status: publish
+published: true
+title: 'Remote Redis: Spiped vs Stunnel'
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 363
+wordpress_url: https://itschr.is/?p=363
+date: '2017-05-19 10:39:42 +0000'
+date_gmt: '2017-05-19 10:39:42 +0000'
+categories:
+- Coding
+- Linux
+- redis
+tags: []
+comments: []
+---
+<p>Redis is fast, there's no doubt about that. Unfortunately for us, connecting to Redis has an overhead, and the method you connect with can have a huge impact.</p>
+<h2>Connecting locally</h2>
+<p>Our options for connecting locally are Unix sockets or TCP sockets, so let's start by comparing them directly:</p>
+<p>Socket vs TCP:<br />
+<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1BUTXAvtaZ3OgMua-GQHfVO2_xG_QpiOASDAIj3xAzGo/pubchart?oid=1804726560&amp;format=interactive"></iframe></p>
+<p>As we can see, the higher overhead of TCP connections limits the throughput. By <a href="https://redis.io/topics/pipelining">pipelining</a> multiple requests through single connections, we can reduce the TCP setup overhead and get performance approaching that of sockets:</p>
+<p>Socket vs tcp with pipeline of 1000:<br />
+<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1BUTXAvtaZ3OgMua-GQHfVO2_xG_QpiOASDAIj3xAzGo/pubchart?oid=1629826158&amp;format=interactive"></iframe></p>
+<h2>Connecting over the network:</h2>
+<p>When we connect over the network, we have no choice but to use TCP sockets, and since redis has <a href="https://redis.io/topics/security#data-encryption-support">no network security</a>, we need to secure our connections.</p>
+<p>Our options for secure connections are <a href="https://www.stunnel.org/index.html">stunnel</a> and <a href="https://www.tarsnap.com/spiped.html">spiped</a>, let's test them both out.</p>
+<p>Spiped vs stunnel:<br />
+<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1BUTXAvtaZ3OgMua-GQHfVO2_xG_QpiOASDAIj3xAzGo/pubchart?oid=1428434209&amp;format=interactive"></iframe></p>
+<p>As we can see, spiped seems to be hitting some kind of bottleneck, limiting the numbers regardless of the tests performed. The problem here appears to be that <a href="https://github.com/Tarsnap/spiped">spiped</a> pads messages:</p>
+<blockquote><p>
+[spiped] can significantly increase bandwidth usage for interactive sessions: It sends data in packets of 1024 bytes, and pads smaller messages up to this length, so a 1 byte write could be expanded to 1024 bytes if it cannot be coalesced with adjacent bytes.
+</p></blockquote>
+<p>So when we're doing a large number of small requests with redis-benchmark, each small request is padded out to make it much larger, maxing out our bandwidth:</p>
+<p><img src="http://i.imgur.com/hnNf7A2.png" width="610" height="361" class="alignnone" /></p>
+<p>Like with unix sockets vs tcp, this improves when we use pipelining, as less bandwidth is wasted to padding:</p>
+<p>Spiped vs stunnel, pipeline 1000:<br />
+<iframe width="600" height="371" seamless frameborder="0" scrolling="no" src="https://docs.google.com/spreadsheets/d/1BUTXAvtaZ3OgMua-GQHfVO2_xG_QpiOASDAIj3xAzGo/pubchart?oid=1633790963&amp;format=interactive"></iframe></p>
+<p>There's still a gap, but it's much narrower now.</p>
+<h2>Conclusion</h2>
+<p>So what's the solution? If you can, have your application on the same server as Redis, so that you can use Unix sockets for performance.<br />
+If you have to run over the network, bear in mind the overhead of spiped when sending large numbers of small requests.<br />
+Pipelining can have a huge impact, performing better over the network than none-pipelined locally. The issue is that not every application can neatly bundle all requests into pipelined chunks, so your result may vary depending on use case.</p>
+<p>All tests were performed between two Kimsufi ks-5 dedicated servers, with a 100mb link.</p>

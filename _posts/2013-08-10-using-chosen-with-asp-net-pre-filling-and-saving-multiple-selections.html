@@ -1,0 +1,75 @@
+---
+layout: post
+status: publish
+published: true
+title: 'Using Chosen with ASP.net: pre filling and saving multiple selections'
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 13
+wordpress_url: http://itschr.is/?p=13
+date: '2013-08-10 00:52:00 +0000'
+date_gmt: '2013-08-10 00:52:00 +0000'
+categories:
+- Coding
+- Javascript
+tags:
+- Coding
+comments: []
+---
+<div dir="ltr"><b>The problem</b><br />
+- You want to use Chosen to snazz up your dropdowns.<br />
+- You need to store the selected values.<br />
+- You need to prefill the selected values when the page is reloaded.</div>
+<div dir="ltr"></div>
+<div dir="ltr"><b>Setting up chosen:&nbsp;</b>Add chosen to the project. The simplest way is to use NuGet Package Manager:</p>
+<p>- Right click solution explorer > Manager NuGet Packages > Search for "chosen" > "Install"</p>
+<p>Once it has installed you will need to reference it in your .aspx file:</p>
+<pre><link&nbsp;href="../Content/chosen.css"&nbsp;rel="stylesheet"&nbsp;type="text/css"&nbsp;/>
+<script&nbsp;type="text/javascript"&nbsp;src="../Scripts/chosen.jquery.js">script></pre>
+<p>Add the chosen class to your select:<br />
+(The data-placeholder is the test shown before you make a selection)</p>
+<pre><select&nbsp;class="chosen"&nbsp;data-placeholder="Select&nbsp;Recipients..."&nbsp;multiple="true"&nbsp;id="recipients"&nbsp;name&nbsp;= "recipientselect">select></pre>
+<p>Initialise chosen:</p>
+<pre><script&nbsp;type="text/javascript">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$(document).ready(function&nbsp;()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//initialise&nbsp;the&nbsp;recipients&nbsp;field&nbsp;with&nbsp;Chosen
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$(".chosen").chosen();&nbsp;&nbsp;&nbsp;&nbsp;
+script></pre>
+<p><b>Reading the selected fields:</b><br />
+<b><br />
+</b>In codebehind on postback we access the select using its name, and then split the results and loop through them:<br />
+<b><br />
+</b></p>
+<pre>&nbsp;string&nbsp;recipients&nbsp;=&nbsp;Request.Form["recipientselect"];
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(recipients&nbsp;!=&nbsp;null)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;string[]&nbsp;recList&nbsp;=&nbsp;recipients.Split(',');
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;foreach&nbsp;(string&nbsp;rec&nbsp;in&nbsp;recList)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;save&nbsp;the&nbsp;selected&nbsp;recipients
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</pre>
+<p><b><br />
+</b><b><br />
+</b><b>Re-loading the selections into chosen:</b></p>
+<p>Probably not the best way, but it works; I've set up a basic service returning the selected recipients and then added that selection to the dropdown:</p>
+<pre>function&nbsp;FillSelectedRecipients()&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;docID&nbsp;=&nbsp;$("#<%=&nbsp;hidDocID.ClientID&nbsp;%>").val()
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(docID.length&nbsp;>&nbsp;0)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$.ajax({
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type:&nbsp;"POST",&nbsp;url:&nbsp;"EchoService.asmx/GetRecipients",
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data:&nbsp;'{"DocID":&nbsp;"'&nbsp;+&nbsp;$("#<%=&nbsp;hidDocID.ClientID&nbsp;%>").val()&nbsp;+&nbsp;'"}',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contentType:&nbsp;"application/json;&nbsp;charset=utf-8",&nbsp;dataType:&nbsp;"json",
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;success:&nbsp;function&nbsp;(msg)&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$("#recipients").val(msg.d).trigger("liszt:updated");
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;error:&nbsp;function&nbsp;()&nbsp;{&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;});
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</pre>
+<p>The recipients can be loaded in directly as json, but the chosen dropdown needs to be updated using</p>
+<pre>.trigger("liszt:updated")</pre>
+<p>in order to display correctly.</p>
+</div>

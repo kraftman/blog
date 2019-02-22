@@ -1,0 +1,71 @@
+---
+layout: post
+status: publish
+published: true
+title: Installing Cyanogenmod on Galaxy S3 (I9300XXLF2)
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 17
+wordpress_url: http://itschr.is/?p=17
+date: '2012-07-01 10:51:00 +0000'
+date_gmt: '2012-07-01 10:51:00 +0000'
+categories:
+- Android
+tags:
+- samsung galaxy s3
+- android
+- cyanogenmod
+comments: []
+---
+<div dir="ltr">As usual, while trying to use a guide to install something, I failed miserably. In this case, it was the new Cyanogenmod 9 Nightly builds for the Samsung Galaxy S3. As a result, here's a quick guide to how I got it working properly, including all the files you'll need in a handy zip, numbered with the step which requires them. Also included are some quick troubleshooting tips for issues I faced along the way.</p>
+<div></div>
+<div>BEFORE YOU DO ANYTHING, BACK UP EVERYTHING!</div>
+<div></div>
+<div>(Thanks to&nbsp;<a href="http://www.theandroidsoul.com/cyanogenmod-9-cm9-for-galaxy-s3-i9300-guide/">theandroidsoul.com</a>&nbsp;for the initial guide that this one is based on.)</div>
+<div></div>
+<div>1) Install either the 64bit (a) or the 32bit (b) drivers to your pc.</div>
+<div></div>
+<div>2) Copy the Google apps and Cyanogenmod packages to the SD card of your phone.</div>
+<div></div>
+<div>3) Run Odin, reboot the phone while it is connected to PC and hold <b>Volume Down + Home + Power.</b></div>
+<div></div>
+<div>4) Tick the box next to "PDA", and click the "PDA" button, select the file "4-CF-Root-SGS3-v6.3.rar"&nbsp;then press start. Your phone should reboot.</div>
+<div></div>
+<div>5) Hold down <b>Volume Up + Home + Power </b>until the Samsung logo appears, then release. Select "Backup and restore" and then "Backup."</div>
+<div></div>
+<div>6) Select "install zip from sdcard" and then "choose zip from sdcard", select the Cyanogenmod file. Once this is complete do the same for the google apps file.</div>
+<div></div>
+<div>Troubleshooting:</div>
+<div></div>
+<div><b>Phone isn't detected by the computer/Odin:</b></div>
+<div><b>&nbsp;</b></div>
+<div>- Reinstall the drivers</div>
+<div>- Try alternate drivers (32 bit instead of 64)</div>
+<div>- Install drivers using&nbsp;<a href="http://www.samsung.com/uk/support/usefulsoftware/KIES/JSP">Samsung Kies</a></div>
+<div>-&nbsp;Switch&nbsp;USB ports</div>
+<div>- Enabled USB debugging in phone options</div>
+<div>- Refresh the hardware in device manager (Device Manager> Scan for Hardware Changes)</div>
+<div>- Use another computer (annoyingly I had to do this)</div>
+<div></div>
+<div><b>Phone boots into Android Recovery 3e not ClockWorkMod Recovery:</b></div>
+<div></div>
+<div>- Re-run Odin.</div>
+<div>- Find the most recent version of CF-Root (This was the issue for me, needed v6.3)</div>
+<div></div>
+<div><b>Cyanogenmod hangs while booting:</b></div>
+<div><b>&nbsp;</b></div>
+<div>- "Wipe data/factory reset" in CWM Recovery (BACKUP FIRST!)</div>
+<div>- Try a different&nbsp;<a href="http://get.cm/?device=i9300">Nightly</a></div>
+<div></div>
+<div></div>
+<div>Hopefully this will help someone learn from my mistakes and save themselves a few hours.</div>
+<div></div>
+<div>Downloads:</div>
+<div><a href="http://goo.gl/PhUQ2">Dropbox</a>&nbsp;(might die if it gets hammered)</div>
+<div><a href="http://goo.gl/GO3su">Rapidshare</a></div>
+<div></div>
+<div></div>
+<div></div>
+</div>

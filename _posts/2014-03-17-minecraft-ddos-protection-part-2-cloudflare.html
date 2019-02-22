@@ -1,0 +1,61 @@
+---
+layout: post
+status: publish
+published: true
+title: 'Minecraft DDOS protection part 2: Cloudflare '
+author: chris
+author_login: chris
+author_email:  
+author_url: http://itschr.is
+wordpress_id: 150
+wordpress_url: http://itschr.is/?p=150
+date: '2014-03-17 22:49:13 +0000'
+date_gmt: '2014-03-17 22:49:13 +0000'
+categories:
+- Linux
+- Minecraft
+tags: []
+comments: []
+---
+<p>So we've set up our GRE tunnels and redirected all of the minecraft traffic hitting our VPS's down their respective tunnels. The only problem is that there's nothing to distribute players between all our VPS's, which is where DNS records come into play. And while we're at it we'll protect our website too.</p>
+<p>Before we continue, I don't work for cloudflare, I'm not getting paid by them, and I'm not too keen on some of their slightly over the top marketing. With that said, here's why I'm using them:</p>
+<h1><strong>Why cloudflare?</strong></h1>
+<p><strong>Fast</strong></p>
+<p>Cloudflare use an anycast DNS network so the nearest DNS server to you is the one that responds, you can read more about it <a href="http://blog.cloudflare.com/cloudflare-aka-kickassdns">here</a></p>
+<p><strong>Free</strong></p>
+<p>Their basic plan covers everything we need to do, and is completely free.</p>
+<p><strong>Easy to use</strong></p>
+<p>I've bought domains from a few companies, and cloudflares web interface has to be the nicest I've seen, their API is also well documented and easy to work with.</p>
+<p><strong>Extras</strong></p>
+<p>Cloudflare performs some caching, lowering the bandwidth and resource usage of your site, provides analytics for you with zero setup, and if your site goes down, it will host a static cache of your web pages where possible.</p>
+<h1><strong>Website Setup</strong></h1>
+<p>There are a few options for website protection setup depending on your web server location:</p>
+<p><strong>Hosting website on the same server as minecraft:</strong></p>
+<p>Cloudflare isn't required here, you can simply duplicate your VPS's iptables rules and replace 25565 with 80, forwarding the web requests through the tunnel to the protected server. With that said I'd still recommend going with cloudflare for the reasons above.</p>
+<p><strong>Hosting with another provider:</strong></p>
+<p>Since you're using a different connection and IP, attacks on the minecraft server won't affect the site and don't expose the MC server IP. However your website could still be attacked, and if your host doesn't provide and DDOS protection, you may as well use cloudflare's.</p>
+<p><strong>Hosting on another server on the same connection</strong></p>
+<p>This is the situation I'm in, my webserver sits behind a firewall, on the same LAN and internet connection as my MC server. I can't use my tunnels to forward traffic as their endpoints sit on the wrong server, and leaving the webserver on the global IP will leave that IP exposed to attackers.</p>
+<h1><strong>Moving to cloudflare</strong></h1>
+<p>To use cloudflare for your domain you need to need to change your nameservers with your registrar, cloudflare has covered how to do this with the most common registrars <a href="https://support.cloudflare.com/hc/en-us/sections/200038206-How-to-change-DNS-at-your-registrar-to-CloudFlare-s-nameservers">here</a>.</p>
+<p>Once that's done it will take a while to move over, in the mean time cloudflare will provide you with a list of subdomains it's picked up automatically, and it allows you do decide whether or not to use cloudflares network to protect them. It also adds an extra "direct" subdomain which is set to bypass their network. I would recommend removing this since anyone that knows you're using cloudflare, or simply guesses that you might be, can use it to try and get your real IP. Everything else on their site is well documented so I won't go over it again.</p>
+<h1>Adding records</h1>
+<p><strong>Adding A Records</strong></p>
+<p>To start with, we need to add an A record for each VPS, so that instead of IP's, we have a nice readable subdomain we can point our SRV records to, for example "minecraft.itschr.is". This is as easy as clicking "Add" and then entering the new subdomain name and IP.</p>
+<p><strong>Adding SRV records</strong></p>
+<p>Since the domain pointing to our website is now sitting behind a cloudflare IP and not our server IP, and cloudflare doesn't support forwarding MC traffic, we need to add extra information to tell the players' Minecraft client what to do when trying to connect to our domain.</p>
+<p>SRV records enable us to point our domain to an alternative A record, and even tell the players' client an alternative port to use to connect.</p>
+<p><a href="http://en.wikipedia.org/wiki/SRV_record">Wikipedia's description</a>&nbsp;covers SRV records better than I can, so I'll just focus on what's important to us.</p>
+<ul>
+<li>name</li>
+</ul>
+<p>This is location that the client must connect to to receive this SRV record: if set to "@" it will be the domain (itschr.is,) if set to anything else it will be a subdomain (minecraft.itschr.is.)</p>
+<ul>
+<li>target</li>
+</ul>
+<p>Where the SRV record redirects the client to, in this case our VPS's A record</p>
+<h2>Result</h2>
+<p>Now if we add multiple SRV records with the same name, cloudflare will rotate through each target, serving up a new one every time the TTL expires.</p>
+<p>Lets say we have 2 VPS's in the US, and 2 in Europe. We can create an SRV record for each VPS, and player connections will be distributed across all of them. On top of that, we can also pair the US servers together under under a "us.itschr.is" subdomain, and the EU servers together under "eu.itschr.is." This then allows the players to use a server nearer to them for general use (faster ping but lower attack-redundancy) and still use the main domain if they have issues connecting.</p>
+<p>If an attacker takes out a single VPS, it will only affect players connected via that VPS, or players being served that VPS address through SRV records (which will change after the 5 minute TTL)</p>
+<p>That's all for now, I'll come back to this later and talk about how we can lower the TTL further, and automatically remove the SRV record of a VPS under attack.</p>
