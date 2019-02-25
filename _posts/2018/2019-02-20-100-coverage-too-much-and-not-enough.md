@@ -1,4 +1,6 @@
-
+---
+title: "100% Coverage: Too much and not enough"
+---
 
 Code coverage percentage is a controversial subject: some will tell you that you get diminishing returns after 70-80% and it's not worth bothering, others will say that 100% is not enough. The underlying problem is often the approach taken to testing:
 
@@ -33,13 +35,13 @@ We take our codebase, and test all the business logic using unit tests. Then we 
 
 Since we also need to test that each unit of code works with each other, we start writing component tests on top of our unit tests, and then some end to end tests that tests a few happy paths:
 
-![100% coverage](/assetts/img/fragmented-code1.png)
+![layered tests](/assetts/img/fragmented-code1.png)
 
 At this point, since we have 100% unit test coverage, the component and e2e tests overlap the unit tests and we end up directly testing the same chunks of code more than once. The difference is that the component tests (for non business-logic code) are easier to write, do a better job of testing since they test against real code instead of mocks, and are less likely to break when the code changes.
 
 If we reduce the scope of our unit tests down to just code that can easily be tested (the business logic), the other layers of testing can fill in the gaps and help us reach 100% **total coverage** with better confidence in our tests, less overlap, and less effort (since we wrote fewer tests with fewer stub):
 
-![100% coverage](/assetts/img/defragged.png)
+![defragged](/assetts/img/defragged.png)
 
 
 ## Not all code is equal
