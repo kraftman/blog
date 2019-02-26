@@ -1,0 +1,1 @@
+In the first part of this series I'd like to focus on the interview process. Job security is not a one man operation, all of your hard work to maintain it can easily be undermined by your colleagues, and so building a like-minded team around you is essential.
