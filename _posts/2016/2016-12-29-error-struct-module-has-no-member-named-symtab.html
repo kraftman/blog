@@ -2,7 +2,7 @@
 layout: post
 status: publish
 published: true
-title: 'error: &lsquo;struct module&rsquo; has no member named &lsquo;symtab&rsquo;'
+title: 'error: struct module has no member named symtab'
 author: chris
 author_login: chris
 author_email:  
@@ -17,6 +17,6 @@ tags: []
 comments: []
 ---
 <h2>Problem:</h2>
-<p>Running system tap gives the error:&nbsp;'error: &lsquo;struct module&rsquo; has no member named &lsquo;symtab&rsquo;'</p>
+<p>Running system tap gives the error: 'error: struct module has no member named "symtab"'</p>
 <h2>Solution:</h2>
 <p>This is caused by a bug with system tap not containing symtab for ubuntu 16+ in version 2.9, and can be solved by upgrading to systemtap 3.0+ by compiling from source.</p>
