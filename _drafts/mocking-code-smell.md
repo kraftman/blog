@@ -127,4 +127,19 @@ const homeRouter = async (fastify) => {
 
 ```
 
-If you wanted to unit tests routes.js, you would have to spend some time setting up mocks for the bussiness logic, validation, and data access modules. But what are you unit testing? We have extracted all of our logic out of the code and it now has a sinle purpose, to orchestrate other peices of code. At this point we should switch to a component test.
+
+
+
+
+Now we want to test this code, burger.js has no dependencies, so there is nothing to mock. We can just test it directly.
+To unit test routes.js we would need to mock out validation.js, burger.js, and burgerDAL.js, all of which could be fairly complex mocks in the real world.
+Once we've done this, what can we actually test? What changes can we make to routes.js that would break the tests? We could change the order of the functions, or the names of the functions, but that's about it. We can't change the logic of the functions without breaking the tests. This is a code smell. We have to mock out so much code to test this code that we can't actually test anything.
+
+The bike: an anology.
+Another way to think about this is to think about testing a bike. you can test certain features of a bike individually, like the thickness of the tires, the size of the wheels, but the best way to test 
+that the bike will slow down when you apply the breaks isnt to create an aparatus for testing the friction of every single break pad, its to test the bike as a whole. 
+
+Ways to change
+
+Our goal with testing is to be able to allow the code under test to be as flexible as possible while still passing the test. If you cant refactor the code without it breaking your test, you have a brittle test
+which means you will have to spend more time fixing tests than you should. The better your abstraction, the better your code. In the bike example, you can easily remove the wheel of a bike and replace it with any other wheel without an issue, there is a single interface, the dropout, which has defined standards about size.

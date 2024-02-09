@@ -2,7 +2,7 @@ Javascript: classes, prototypes, and interviews
 
 When preparing for interviews that focus on Javascript, some common themes tend to emerge.
 Gotchas about comparisons, questions about scope, hoisting, and closures. One that caught my eye in particular, however, was 'Explain the difference between classical vs prototypal inheritance'.
-One article when so far to basically say if a candidate couldn't explain the difference, that would be the interview over.
+One article went so far to basically say if a candidate couldn't explain the difference, that would be the interview over.
 
 Classical inheritance:
 Objects can only be created by instantiating classes

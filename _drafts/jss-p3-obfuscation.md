@@ -8,4 +8,4 @@ the goal is to make sure there's a barrier to entry to anyone new coming in and 
 
 other tips:
 - use inheritance as much as possible
-- use index.js to people cant find files
+- use index.js so people cant find files
